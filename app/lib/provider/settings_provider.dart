@@ -65,6 +65,7 @@ class SettingsService extends PureNotifier<SettingsState> {
     minimizeToTray: _persistence.isMinimizeToTray(),
     https: _persistence.isHttps(),
     sendMode: _persistence.getSendMode(),
+    sendSequentialFinalize: _persistence.getSendSequentialFinalize(),
     saveWindowPlacement: _persistence.getSaveWindowPlacement(),
     enableAnimations: _persistence.getEnableAnimations(),
     deviceType: _persistence.getDeviceType(),
@@ -237,6 +238,13 @@ class SettingsService extends PureNotifier<SettingsState> {
     await _persistence.setSendMode(mode);
     state = state.copyWith(
       sendMode: mode,
+    );
+  }
+
+  Future<void> setSendSequentialFinalize(bool value) async {
+    await _persistence.setSendSequentialFinalize(value);
+    state = state.copyWith(
+      sendSequentialFinalize: value,
     );
   }
 

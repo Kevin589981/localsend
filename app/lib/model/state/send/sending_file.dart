@@ -8,6 +8,8 @@ part 'sending_file.mapper.dart';
 
 @MappableClass()
 class SendingFile with SendingFileMappable {
+  /// Index in the outgoing send queue (0-based). Used for ordered tail finalize.
+  final int queueIndex;
   final FileDto file;
   final String? token;
   final Uint8List? thumbnail;
@@ -17,6 +19,7 @@ class SendingFile with SendingFileMappable {
   final String? errorMessage; // when failed; the live status is tracked in fileTransferProvider
 
   const SendingFile({
+    required this.queueIndex,
     required this.file,
     required this.token,
     required this.thumbnail,
@@ -29,6 +32,6 @@ class SendingFile with SendingFileMappable {
   /// Custom toString() to avoid printing the bytes.
   @override
   String toString() {
-    return 'SendingFile(file: $file, token: $token, thumbnail: ${thumbnail != null ? thumbnail!.length : 'null'}, asset: $asset, path: $path, bytes: ${bytes != null ? bytes!.length : 'null'}, errorMessage: $errorMessage)';
+    return 'SendingFile(queueIndex: $queueIndex, file: $file, token: $token, thumbnail: ${thumbnail != null ? thumbnail!.length : 'null'}, asset: $asset, path: $path, bytes: ${bytes != null ? bytes!.length : 'null'}, errorMessage: $errorMessage)';
   }
 }

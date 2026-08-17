@@ -12,6 +12,7 @@ import 'package:localsend_app/pages/send_page.dart';
 import 'package:localsend_app/provider/device_info_provider.dart';
 import 'package:localsend_app/provider/file_transfer_provider.dart';
 import 'package:localsend_app/provider/http_provider.dart';
+import 'package:localsend_app/provider/network/send_tail_coordinator.dart';
 import 'package:localsend_app/provider/selection/selected_sending_files_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
 import 'package:localsend_app/widget/dialogs/pin_dialog.dart';
@@ -109,8 +110,9 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
         status: SessionStatus.waiting,
         target: target,
         files: {
-          for (final (:id, :file) in selectedFiles)
+          for (final (i, (:id, :file)) in selectedFiles.indexed)
             id: SendingFile(
+              queueIndex: i,
               file: FileDto(
                 id: id,
                 fileName: file.name,
@@ -494,10 +496,21 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
       state: (s) => s?.copyWith(startTime: DateTime.now().millisecondsSinceEpoch),
     );
 
-    await _sendFiles(
-      sessionId: sessionId,
-      files: files.values.toList(),
-    );
+    final orderedTail = ref.read(settingsProvider).sendSequentialFinalize;
+    SendTailCoordinator? tailCoordinator;
+    if (orderedTail) {
+      tailCoordinator = SendTailCoordinator()..start();
+    }
+
+    try {
+      await _sendFiles(
+        sessionId: sessionId,
+        files: files.values.toList(),
+        tailCoordinator: tailCoordinator,
+      );
+    } finally {
+      tailCoordinator?.dispose();
+    }
 
     _finish(sessionId: sessionId);
   }
@@ -593,11 +606,14 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
   Future<void> _sendFiles({
     required String sessionId,
     required List<SendingFile> files,
+    SendTailCoordinator? tailCoordinator,
   }) async {
     final sessionState = state[sessionId];
     if (sessionState == null) {
       return;
     }
+
+    final useOrderedTail = tailCoordinator != null;
 
     final uploadFiles = [
       for (final file in files)
@@ -608,6 +624,9 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
             filePath: file.path,
             fileBytes: file.bytes,
             fileSize: file.file.size,
+            queueIndex: file.queueIndex,
+            orderedTailFinalize: useOrderedTail,
+            finishOrderIndex: useOrderedTail ? file.queueIndex : null,
           ),
     ];
 
@@ -622,6 +641,7 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
             remoteSessionId: sessionState.remoteSessionId,
             files: uploadFiles,
             device: sessionState.target,
+            tailCoordinatorSendPort: tailCoordinator?.requestSendPort,
           ),
         );
 
@@ -663,6 +683,13 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
                 );
             _updateForegroundServiceProgress(sessionId);
             ref.notifier(fileTransferProvider).setStatus(sessionId: sessionId, fileId: event.fileId, status: FileStatus.finished);
+            // Signal the tail coordinator that this file is done
+            if (tailCoordinator != null) {
+              final sendingFile = state[sessionId]?.files[event.fileId];
+              if (sendingFile != null) {
+                tailCoordinator.onFileUploadFinished(sendingFile.queueIndex);
+              }
+            }
           case HttpUploadFileFailedEvent():
             _logger.warning('Error while sending file ${state[sessionId]?.files[event.fileId]?.file.fileName}: ${event.error}');
             ref.notifier(fileTransferProvider).setStatus(sessionId: sessionId, fileId: event.fileId, status: FileStatus.failed);
@@ -670,6 +697,13 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
               sessionId: sessionId,
               state: (s) => s?.withFileError(event.fileId, event.error),
             );
+            // Signal the tail coordinator that this file is done (even on failure)
+            if (tailCoordinator != null) {
+              final sendingFile = state[sessionId]?.files[event.fileId];
+              if (sendingFile != null) {
+                tailCoordinator.onFileUploadFinished(sendingFile.queueIndex);
+              }
+            }
         }
       }
     } catch (e, st) {

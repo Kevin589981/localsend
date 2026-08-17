@@ -1153,6 +1153,9 @@ class Translations$settingsTab$send$en {
 
   /// en: 'Create checksums when sending files'
   String get createChecksums => 'Create checksums when sending files';
+
+  /// en: 'Serial (ordered completion for iOS Photos)'
+  String get sequentialFinalize => 'Serial (ordered completion for iOS Photos)';
 }
 
 // Path: settingsTab.network

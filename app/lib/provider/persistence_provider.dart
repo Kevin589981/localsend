@@ -95,6 +95,7 @@ const _createChecksums = 'ls_create_checksums';
 const _verifyChecksums = 'ls_verify_checksums';
 const _advancedSettingsKey = 'ls_advanced_settings';
 const _whatsNewKey = 'ls_whats_new';
+const _sendSequentialFinalize = 'ls_send_sequential_finalize';
 
 final persistenceProvider = Provider<PersistenceService>((ref) {
   throw Exception('persistenceProvider not initialized');
@@ -407,6 +408,14 @@ class PersistenceService {
 
   Future<void> setVerifyChecksums(bool verifyChecksums) async {
     await _prefs.setBool(_verifyChecksums, verifyChecksums);
+  }
+
+  bool getSendSequentialFinalize() {
+    return _prefs.getBool(_sendSequentialFinalize) ?? false;
+  }
+
+  Future<void> setSendSequentialFinalize(bool value) async {
+    await _prefs.setBool(_sendSequentialFinalize, value);
   }
 
   String getMulticastGroup() {
