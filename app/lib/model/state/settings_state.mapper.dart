@@ -169,6 +169,12 @@ class SettingsStateMapper extends ClassMapperBase<SettingsState> {
     'advancedSettings',
     _$advancedSettings,
   );
+  static bool _$sendSequentialFinalize(SettingsState v) =>
+      v.sendSequentialFinalize;
+  static const Field<SettingsState, bool> _f$sendSequentialFinalize = Field(
+    'sendSequentialFinalize',
+    _$sendSequentialFinalize,
+  );
 
   @override
   final MappableFields<SettingsState> fields = const {
@@ -202,6 +208,7 @@ class SettingsStateMapper extends ClassMapperBase<SettingsState> {
     #verifyChecksums: _f$verifyChecksums,
     #discoveryTimeout: _f$discoveryTimeout,
     #advancedSettings: _f$advancedSettings,
+    #sendSequentialFinalize: _f$sendSequentialFinalize,
   };
 
   static SettingsState _instantiate(DecodingData data) {
@@ -236,6 +243,7 @@ class SettingsStateMapper extends ClassMapperBase<SettingsState> {
       verifyChecksums: data.dec(_f$verifyChecksums),
       discoveryTimeout: data.dec(_f$discoveryTimeout),
       advancedSettings: data.dec(_f$advancedSettings),
+      sendSequentialFinalize: data.dec(_f$sendSequentialFinalize),
     );
   }
 
@@ -336,6 +344,7 @@ abstract class SettingsStateCopyWith<$R, $In extends SettingsState, $Out>
     bool? verifyChecksums,
     int? discoveryTimeout,
     bool? advancedSettings,
+    bool? sendSequentialFinalize,
   });
   SettingsStateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -398,6 +407,7 @@ class _SettingsStateCopyWithImpl<$R, $Out>
     bool? verifyChecksums,
     int? discoveryTimeout,
     bool? advancedSettings,
+    bool? sendSequentialFinalize,
   }) => $apply(
     FieldCopyWithData({
       if (showToken != null) #showToken: showToken,
@@ -434,6 +444,8 @@ class _SettingsStateCopyWithImpl<$R, $Out>
       if (verifyChecksums != null) #verifyChecksums: verifyChecksums,
       if (discoveryTimeout != null) #discoveryTimeout: discoveryTimeout,
       if (advancedSettings != null) #advancedSettings: advancedSettings,
+      if (sendSequentialFinalize != null)
+        #sendSequentialFinalize: sendSequentialFinalize,
     }),
   );
   @override
@@ -480,6 +492,10 @@ class _SettingsStateCopyWithImpl<$R, $Out>
     verifyChecksums: data.get(#verifyChecksums, or: $value.verifyChecksums),
     discoveryTimeout: data.get(#discoveryTimeout, or: $value.discoveryTimeout),
     advancedSettings: data.get(#advancedSettings, or: $value.advancedSettings),
+    sendSequentialFinalize: data.get(
+      #sendSequentialFinalize,
+      or: $value.sendSequentialFinalize,
+    ),
   );
 
   @override

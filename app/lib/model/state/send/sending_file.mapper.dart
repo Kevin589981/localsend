@@ -22,6 +22,11 @@ class SendingFileMapper extends ClassMapperBase<SendingFile> {
   @override
   final String id = 'SendingFile';
 
+  static int _$queueIndex(SendingFile v) => v.queueIndex;
+  static const Field<SendingFile, int> _f$queueIndex = Field(
+    'queueIndex',
+    _$queueIndex,
+  );
   static FileDto _$file(SendingFile v) => v.file;
   static const Field<SendingFile, FileDto> _f$file = Field('file', _$file);
   static String? _$token(SendingFile v) => v.token;
@@ -48,6 +53,7 @@ class SendingFileMapper extends ClassMapperBase<SendingFile> {
 
   @override
   final MappableFields<SendingFile> fields = const {
+    #queueIndex: _f$queueIndex,
     #file: _f$file,
     #token: _f$token,
     #thumbnail: _f$thumbnail,
@@ -59,6 +65,7 @@ class SendingFileMapper extends ClassMapperBase<SendingFile> {
 
   static SendingFile _instantiate(DecodingData data) {
     return SendingFile(
+      queueIndex: data.dec(_f$queueIndex),
       file: data.dec(_f$file),
       token: data.dec(_f$token),
       thumbnail: data.dec(_f$thumbnail),
@@ -131,6 +138,7 @@ abstract class SendingFileCopyWith<$R, $In extends SendingFile, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>>? get bytes;
   $R call({
+    int? queueIndex,
     FileDto? file,
     String? token,
     Uint8List? thumbnail,
@@ -161,6 +169,7 @@ class _SendingFileCopyWithImpl<$R, $Out>
       : null;
   @override
   $R call({
+    int? queueIndex,
     FileDto? file,
     Object? token = $none,
     Object? thumbnail = $none,
@@ -170,6 +179,7 @@ class _SendingFileCopyWithImpl<$R, $Out>
     Object? errorMessage = $none,
   }) => $apply(
     FieldCopyWithData({
+      if (queueIndex != null) #queueIndex: queueIndex,
       if (file != null) #file: file,
       if (token != $none) #token: token,
       if (thumbnail != $none) #thumbnail: thumbnail,
@@ -181,6 +191,7 @@ class _SendingFileCopyWithImpl<$R, $Out>
   );
   @override
   SendingFile $make(CopyWithData data) => SendingFile(
+    queueIndex: data.get(#queueIndex, or: $value.queueIndex),
     file: data.get(#file, or: $value.file),
     token: data.get(#token, or: $value.token),
     thumbnail: data.get(#thumbnail, or: $value.thumbnail),

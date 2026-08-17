@@ -28,12 +28,16 @@ class HttpUploadFile {
   final List<int>? fileBytes;
   final int fileSize;
 
+  /// 0-based queue position for ordered upload. `null` when unordered.
+  final int? queueIndex;
+
   HttpUploadFile({
     required this.remoteFileToken,
     required this.fileId,
     required this.filePath,
     required this.fileBytes,
     required this.fileSize,
+    this.queueIndex,
   });
 }
 

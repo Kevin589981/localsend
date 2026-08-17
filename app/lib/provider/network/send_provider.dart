@@ -604,7 +604,7 @@ class SendNotifier extends Notifier<Map<String, SendSessionState>> {
       return;
     }
 
-    final uploadFiles = [
+    final List<HttpUploadFile> uploadFiles = [
       for (final file in files)
         if (file.token != null)
           HttpUploadFile(
